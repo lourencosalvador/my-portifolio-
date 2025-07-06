@@ -207,9 +207,6 @@ export default function Page() {
               <BlurFade delay={BLUR_FADE_DELAY * 16}>
                 <div className="flex flex-col items-center justify-center space-y-4 text-center">
                   <div className="space-y-2">
-                    <div className="inline-block rounded-lg bg-gradient-to-r from-purple-500 to-cyan-500 text-white px-3 py-2 text-sm font-semibold shadow-lg">
-                      Let&apos;s Talk
-                    </div>
                     <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-shadow-glow">
                       Get In Touch
                     </h2>

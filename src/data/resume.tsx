@@ -164,31 +164,27 @@ export const DATA = {
   ],
   projects: [
     {
-      title: "Chat Collect",
-      href: "https://chatcollect.com",
+      title: "Movie Finder",
+      href: "https://movie-finder-ten-orcin.vercel.app/",
       dates: "Jan 2024 - Feb 2024",
       active: true,
       description:
-        "With the release of the [OpenAI GPT Store](https://openai.com/blog/introducing-the-gpt-store), I decided to build a SaaS which allows users to collect email addresses from their GPT users. This is a great way to build an audience and monetize your GPT API usage.",
+        "Movie Finder is a responsive web application developed with the goal of allowing users to search, discover, and explore detailed information about movies in real time, using public APIs such as TMDB (The Movie Database).",
       technologies: [
         "Next.js",
-        "Typescript",
-        "PostgreSQL",
-        "Prisma",
+        "Typescript", 
         "TailwindCSS",
-        "Stripe",
-        "Shadcn UI",
+        "TMDB API",
       ],
       links: [
         {
           type: "Website",
-          href: "https://chatcollect.com",
+          href: "https://movie-finder-ten-orcin.vercel.app/",
           icon: <Icons.globe className="size-3" />,
         },
       ],
       image: "",
-      video:
-        "https://pub-83c5db439b40468498f97946200806f7.r2.dev/chat-collect.mp4",
+      video: "/movie-finder.mp4",
     },
     {
       title: "Build UI",
@@ -220,33 +216,6 @@ export const DATA = {
       ],
       image: "",
       video: "/build-ui.mp4",
-    },
-    {
-      title: "Chat Collect",
-      href: "/",
-      dates: "Jan 2024 - Feb 2024",
-      active: true,
-      description:
-        "With the release of the [OpenAI GPT Store](https://openai.com/blog/introducing-the-gpt-store), I decided to build a SaaS which allows users to collect email addresses from their GPT users. This is a great way to build an audience and monetize your GPT API usage.",
-      technologies: [
-        "Next.js",
-        "Typescript",
-        "PostgreSQL",
-        "Prisma",
-        "TailwindCSS",
-        "Stripe",
-        "Shadcn UI",
-      ],
-      links: [
-        {
-          type: "Website",
-          href: "/",
-          icon: <Icons.globe className="size-3" />,
-        },
-      ],
-      image: "",
-      video:
-        "https://pub-83c5db439b40468498f97946200806f7.r2.dev/chat-collect.mp4",
     },
     {
       title: "Chat Collect",
