@@ -13,19 +13,20 @@ export default function Icon() {
     (
       <div
         style={{
-          fontSize: 24,
-          background: 'transparent',
+          fontSize: 16,
+          background: 'linear-gradient(45deg, #8b5cf6, #06b6d4)',
+          color: 'white',
           width: '100%',
           height: '100%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           borderRadius: '50%',
-          backgroundImage: `url(${DATA.avatarUrl})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          fontWeight: 'bold',
         }}
-      />
+      >
+        {DATA.initials}
+      </div>
     ),
     {
       ...size,

@@ -4,8 +4,23 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Home, ArrowLeft, Zap, AlertTriangle, RefreshCw, Search } from "lucide-react";
 import BlurFade from "@/components/magicui/blur-fade";
+import { useState, useEffect } from "react";
 
 export default function NotFound() {
+  const [particles, setParticles] = useState<Array<{ id: number; left: number; top: number; delay: number; duration: number }>>([]);
+
+  useEffect(() => {
+    // Generate particles only on client
+    const newParticles = Array.from({ length: 20 }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      delay: Math.random() * 5,
+      duration: Math.random() * 3 + 2
+    }));
+    setParticles(newParticles);
+  }, []);
+
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Animated Background */}
@@ -215,27 +230,25 @@ export default function NotFound() {
 
         {/* Floating Particles */}
         <div className="absolute inset-0 pointer-events-none">
-          {[...Array(20)].map((_, i) => (
+          {particles.map((particle) => (
             <motion.div
-              key={i}
+              key={particle.id}
               className="absolute w-2 h-2 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full"
               initial={{
-                x: Math.random() * window.innerWidth,
-                y: Math.random() * window.innerHeight,
                 opacity: 0
               }}
               animate={{
-                y: [null, -100],
+                y: [0, -100],
                 opacity: [0, 1, 0]
               }}
               transition={{
-                duration: Math.random() * 3 + 2,
+                duration: particle.duration,
                 repeat: Infinity,
-                delay: Math.random() * 5
+                delay: particle.delay
               }}
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`
+                left: `${particle.left}%`,
+                top: `${particle.top}%`
               }}
             />
           ))}
