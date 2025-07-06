@@ -24,8 +24,16 @@ export const metadata: Metadata = {
     description: DATA.description,
     url: DATA.url,
     siteName: `${DATA.name}`,
-    locale: "en_US",
+    locale: "pt_BR",
     type: "website",
+    images: [
+      {
+        url: "/perfil.jpeg",
+        width: 1200,
+        height: 630,
+        alt: `${DATA.name} - Portfolio`,
+      },
+    ],
   },
   robots: {
     index: true,
@@ -40,7 +48,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     title: `${DATA.name}`,
+    description: DATA.description,
     card: "summary_large_image",
+    images: ["/perfil.jpeg"],
   },
   verification: {
     google: "",
@@ -57,7 +67,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased max-w-2xl mx-auto py-12 sm:py-24 px-6",
+          "min-h-screen bg-background font-sans antialiased py-12 sm:py-24 px-6",
           fontSans.variable
         )}
       >

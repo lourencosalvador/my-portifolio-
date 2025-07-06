@@ -1,0 +1,581 @@
+---
+title: "Mastering React Native Prebuild: From Zero to Production-Ready"
+publishedAt: "2024-12-05"
+summary: "Learn how to leverage Expo prebuild to create scalable, maintainable React Native applications with native code control."
+image: "/blog/react-native-prebuild.jpg"
+category: "React Native"
+emoji: "📱"
+readingTime: "15"
+author: "Lorrys Code"
+---
+
+# Mastering React Native Prebuild: From Zero to Production-Ready
+
+React Native development has evolved significantly, and prebuild is at the forefront of this evolution. Let's explore how to harness the power of Expo prebuild to create robust, scalable applications while maintaining full control over your native code.
+
+## 🎯 What is Prebuild and Why It Matters
+
+Prebuild is Expo's solution for generating native code from your managed workflow. Think of it as a bridge between the simplicity of Expo managed workflow and the flexibility of a bare React Native project.
+
+### Traditional Approach vs. Prebuild
+
+```bash
+# Traditional Expo Managed
+expo start
+# Limited native customization, but super simple
+
+# Traditional Bare React Native
+npx react-native init MyApp
+# Full control, but complex setup and maintenance
+
+# Prebuild - Best of Both Worlds
+expo prebuild
+# Generates native code when needed, stays managed otherwise
+```
+
+## 🚀 Setting Up Your Prebuild Environment
+
+### 1. Project Initialization
+
+```bash
+# Create a new Expo project
+npx create-expo-app MyApp --template
+
+# Navigate to your project
+cd MyApp
+
+# Install dependencies
+npm install
+
+# Generate native code
+expo prebuild
+```
+
+### 2. Essential Configuration
+
+Your `app.json` or `app.config.js` is the heart of prebuild configuration:
+
+```json
+{
+  "expo": {
+    "name": "MyApp",
+    "slug": "my-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "bundleIdentifier": "com.mycompany.myapp",
+      "buildNumber": "1.0.0",
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.mycompany.myapp",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      }
+    },
+    "plugins": [
+      "expo-camera",
+      "expo-location",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 33,
+            "targetSdkVersion": 33,
+            "buildToolsVersion": "33.0.0"
+          },
+          "ios": {
+            "deploymentTarget": "13.0"
+          }
+        }
+      ]
+    ]
+  }
+}
+```
+
+## 🔧 Advanced Prebuild Configuration
+
+### 1. Custom Plugins
+
+Create custom plugins for specific native modifications:
+
+```javascript
+// plugins/withCustomAndroidManifest.js
+const { withAndroidManifest } = require('@expo/config-plugins');
+
+function withCustomAndroidManifest(config) {
+  return withAndroidManifest(config, async config => {
+    const androidManifest = config.modResults;
+    
+    // Add custom permissions
+    androidManifest.manifest.$ = {
+      ...androidManifest.manifest.$,
+      'xmlns:tools': 'http://schemas.android.com/tools',
+    };
+    
+    // Add custom application attributes
+    const application = androidManifest.manifest.application[0];
+    application.$ = {
+      ...application.$,
+      'android:requestLegacyExternalStorage': 'true',
+      'android:usesCleartextTraffic': 'true',
+    };
+    
+    return config;
+  });
+}
+
+module.exports = withCustomAndroidManifest;
+```
+
+### 2. iOS Configuration
+
+```javascript
+// plugins/withCustomInfoPlist.js
+const { withInfoPlist } = require('@expo/config-plugins');
+
+function withCustomInfoPlist(config) {
+  return withInfoPlist(config, config => {
+    const infoPlist = config.modResults;
+    
+    // Add custom URL schemes
+    infoPlist.CFBundleURLTypes = [
+      {
+        CFBundleURLName: 'com.mycompany.myapp',
+        CFBundleURLSchemes: ['myapp'],
+      },
+    ];
+    
+    // Add privacy permissions
+    infoPlist.NSCameraUsageDescription = 'This app needs access to camera to take photos';
+    infoPlist.NSLocationWhenInUseUsageDescription = 'This app needs access to location';
+    
+    return config;
+  });
+}
+
+module.exports = withCustomInfoPlist;
+```
+
+### 3. Using Custom Plugins in app.config.js
+
+```javascript
+// app.config.js
+const withCustomAndroidManifest = require('./plugins/withCustomAndroidManifest');
+const withCustomInfoPlist = require('./plugins/withCustomInfoPlist');
+
+module.exports = {
+  expo: {
+    name: "MyApp",
+    slug: "my-app",
+    // ... other config
+    plugins: [
+      "expo-camera",
+      "expo-location",
+      withCustomAndroidManifest,
+      withCustomInfoPlist,
+      [
+        "expo-build-properties",
+        {
+          android: {
+            compileSdkVersion: 33,
+            targetSdkVersion: 33,
+            minSdkVersion: 21,
+            proguardMinifyEnabled: true,
+            shrinkResources: true,
+          },
+          ios: {
+            deploymentTarget: "13.0",
+          },
+        },
+      ],
+    ],
+  },
+};
+```
+
+## 🏗️ Development Workflow Best Practices
+
+### 1. Environment Management
+
+```javascript
+// config/environments.js
+const IS_DEV = process.env.NODE_ENV === 'development';
+const IS_PREVIEW = process.env.EXPO_PUBLIC_ENV === 'preview';
+
+export const CONFIG = {
+  API_URL: IS_DEV 
+    ? 'http://localhost:3000' 
+    : IS_PREVIEW 
+      ? 'https://api-preview.myapp.com' 
+      : 'https://api.myapp.com',
+  
+  SENTRY_DSN: IS_DEV ? null : process.env.SENTRY_DSN,
+  
+  ANALYTICS_ID: IS_DEV ? null : process.env.ANALYTICS_ID,
+};
+```
+
+### 2. Automated Build Scripts
+
+```json
+{
+  "scripts": {
+    "prebuild": "expo prebuild",
+    "prebuild:clean": "expo prebuild --clean",
+    "build:ios": "eas build --platform ios",
+    "build:android": "eas build --platform android",
+    "build:all": "eas build --platform all",
+    "submit:ios": "eas submit --platform ios",
+    "submit:android": "eas submit --platform android"
+  }
+}
+```
+
+### 3. EAS Build Configuration
+
+```json
+{
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_ENV": "preview"
+      }
+    },
+    "production": {
+      "env": {
+        "EXPO_PUBLIC_ENV": "production"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "your-apple-id@example.com",
+        "ascAppId": "1234567890",
+        "appleTeamId": "ABCDEF1234"
+      },
+      "android": {
+        "serviceAccountKeyPath": "./service-account-key.json",
+        "track": "production"
+      }
+    }
+  }
+}
+```
+
+## 🔍 Native Code Integration
+
+### 1. Adding Native Dependencies
+
+```bash
+# Install native library
+npm install react-native-biometrics
+
+# Add to plugins in app.config.js
+{
+  "plugins": [
+    "react-native-biometrics"
+  ]
+}
+
+# Regenerate native code
+expo prebuild --clean
+```
+
+### 2. Custom Native Modules
+
+```javascript
+// Example: Custom native module integration
+import { NativeModules } from 'react-native';
+
+// TypeScript definitions
+interface CustomNativeModule {
+  performSecureOperation(data: string): Promise<string>;
+  checkDeviceCapabilities(): Promise<boolean>;
+}
+
+const { CustomNativeModule } = NativeModules as {
+  CustomNativeModule: CustomNativeModule;
+};
+
+export const useSecureOperations = () => {
+  const performOperation = async (data: string) => {
+    try {
+      const result = await CustomNativeModule.performSecureOperation(data);
+      return { success: true, result };
+    } catch (error) {
+      return { success: false, error };
+    }
+  };
+
+  return { performOperation };
+};
+```
+
+## 🚀 Performance Optimization
+
+### 1. Bundle Optimization
+
+```javascript
+// metro.config.js
+const { getDefaultConfig } = require('expo/metro-config');
+
+const config = getDefaultConfig(__dirname);
+
+config.transformer.minifierConfig = {
+  ecma: 8,
+  keep_fnames: true,
+  mangle: {
+    keep_fnames: true,
+  },
+};
+
+// Add asset extensions
+config.resolver.assetExts.push('db', 'mp3', 'ttf', 'obj', 'png', 'jpg');
+
+module.exports = config;
+```
+
+### 2. Code Splitting and Lazy Loading
+
+```javascript
+import { lazy, Suspense } from 'react';
+import { View, Text } from 'react-native';
+
+// Lazy load heavy components
+const HeavyComponent = lazy(() => import('./HeavyComponent'));
+const ChartComponent = lazy(() => import('./ChartComponent'));
+
+function App() {
+  return (
+    <View>
+      <Suspense fallback={<Text>Loading...</Text>}>
+        <HeavyComponent />
+      </Suspense>
+      
+      <Suspense fallback={<Text>Loading Charts...</Text>}>
+        <ChartComponent />
+      </Suspense>
+    </View>
+  );
+}
+```
+
+### 3. Memory Management
+
+```javascript
+import { useEffect, useRef } from 'react';
+import { AppState } from 'react-native';
+
+export const useMemoryOptimization = () => {
+  const appState = useRef(AppState.currentState);
+  
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
+        // App has come to the foreground
+        // Restore heavy operations
+      } else if (nextAppState.match(/inactive|background/)) {
+        // App has gone to background
+        // Cleanup heavy operations
+      }
+      
+      appState.current = nextAppState;
+    });
+    
+    return () => subscription?.remove();
+  }, []);
+};
+```
+
+## 🔒 Security Best Practices
+
+### 1. Secure Storage
+
+```javascript
+import * as SecureStore from 'expo-secure-store';
+
+export const secureStorage = {
+  async setItem(key: string, value: string) {
+    try {
+      await SecureStore.setItemAsync(key, value);
+    } catch (error) {
+      console.error('Secure storage error:', error);
+    }
+  },
+  
+  async getItem(key: string): Promise<string | null> {
+    try {
+      return await SecureStore.getItemAsync(key);
+    } catch (error) {
+      console.error('Secure storage error:', error);
+      return null;
+    }
+  },
+  
+  async removeItem(key: string) {
+    try {
+      await SecureStore.deleteItemAsync(key);
+    } catch (error) {
+      console.error('Secure storage error:', error);
+    }
+  }
+};
+```
+
+### 2. API Security
+
+```javascript
+// API client with security headers
+import axios from 'axios';
+import { secureStorage } from './secureStorage';
+
+const apiClient = axios.create({
+  baseURL: CONFIG.API_URL,
+  timeout: 10000,
+});
+
+// Request interceptor
+apiClient.interceptors.request.use(async (config) => {
+  const token = await secureStorage.getItem('authToken');
+  
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  
+  // Add security headers
+  config.headers['X-Requested-With'] = 'XMLHttpRequest';
+  config.headers['Content-Type'] = 'application/json';
+  
+  return config;
+});
+
+// Response interceptor
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      await secureStorage.removeItem('authToken');
+      // Redirect to login
+    }
+    return Promise.reject(error);
+  }
+);
+```
+
+## 🎉 Real-World Production Example
+
+Here's a complete example of a production-ready prebuild setup:
+
+```javascript
+// app.config.js
+const IS_DEV = process.env.NODE_ENV === 'development';
+
+module.exports = {
+  expo: {
+    name: "MyProductionApp",
+    slug: "my-production-app",
+    version: "1.0.0",
+    orientation: "portrait",
+    icon: "./assets/icon.png",
+    userInterfaceStyle: "automatic",
+    splash: {
+      image: "./assets/splash.png",
+      resizeMode: "contain",
+      backgroundColor: "#ffffff"
+    },
+    assetBundlePatterns: ["**/*"],
+    ios: {
+      bundleIdentifier: "com.mycompany.myproductionapp",
+      buildNumber: "1.0.0",
+      supportsTablet: true,
+      infoPlist: {
+        NSCameraUsageDescription: "This app needs access to camera to take photos",
+        NSLocationWhenInUseUsageDescription: "This app needs access to location",
+      }
+    },
+    android: {
+      package: "com.mycompany.myproductionapp",
+      versionCode: 1,
+      adaptiveIcon: {
+        foregroundImage: "./assets/adaptive-icon.png",
+        backgroundColor: "#FFFFFF"
+      },
+      permissions: [
+        "android.permission.CAMERA",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
+    },
+    web: {
+      favicon: "./assets/favicon.png"
+    },
+    plugins: [
+      "expo-camera",
+      "expo-location",
+      "expo-secure-store",
+      [
+        "expo-build-properties",
+        {
+          android: {
+            compileSdkVersion: 33,
+            targetSdkVersion: 33,
+            minSdkVersion: 21,
+            proguardMinifyEnabled: !IS_DEV,
+            shrinkResources: !IS_DEV,
+          },
+          ios: {
+            deploymentTarget: "13.0",
+          },
+        },
+      ],
+      [
+        "expo-font",
+        {
+          fonts: ["./assets/fonts/Inter-Regular.otf"]
+        }
+      ]
+    ],
+    extra: {
+      apiUrl: process.env.API_URL,
+      sentryDsn: process.env.SENTRY_DSN,
+      eas: {
+        projectId: "your-project-id"
+      }
+    }
+  }
+};
+```
+
+## 🎯 Conclusion
+
+Prebuild represents the future of React Native development, offering the perfect balance between managed convenience and native flexibility. By following these practices, you'll create applications that are:
+
+- **Scalable**: Easy to maintain and extend
+- **Performant**: Optimized for production
+- **Secure**: Following security best practices
+- **Maintainable**: Clean architecture and code organization
+
+Remember:
+- Start with a solid configuration foundation
+- Use plugins for native customizations
+- Implement proper environment management
+- Follow security best practices
+- Optimize for performance from day one
+
+*Ready to take your React Native development to the next level? Start implementing prebuild in your next project and experience the difference!* 

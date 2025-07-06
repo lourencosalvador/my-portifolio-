@@ -1,0 +1,252 @@
+---
+title: "Next.js: Revolutionizing Performance with 'use cache' and 'use server'"
+publishedAt: "2024-12-15"
+summary: "Discover how Next.js is transforming web development with powerful new directives for caching and server actions."
+image: "/blog/nextjs-performance.jpg"
+category: "Next.js"
+emoji: "⚡"
+readingTime: "8"
+author: "Lorrys Code"
+---
+
+# Next.js: Revolutionizing Performance with 'use cache' and 'use server'
+
+The latest updates to Next.js have introduced game-changing features that are revolutionizing how we build performant web applications. Today, we'll dive deep into two powerful directives: `"use cache"` and `"use server"`.
+
+## 🚀 The Power of "use cache"
+
+The `"use cache"` directive is a breakthrough in React Server Components that allows you to cache expensive computations and data fetches at the function level.
+
+### Basic Usage
+
+```jsx
+import { unstable_cache } from 'next/cache';
+
+"use cache"
+async function getExpensiveData() {
+  // Expensive database query or API call
+  const data = await db.query('SELECT * FROM expensive_table');
+  return data;
+}
+
+export default async function Page() {
+  const data = await getExpensiveData();
+  return <div>{JSON.stringify(data)}</div>;
+}
+```
+
+### Advanced Caching Strategies
+
+```jsx
+"use cache"
+async function getUserData(userId: string) {
+  const user = await fetch(`/api/users/${userId}`)
+    .then(res => res.json());
+  
+  return user;
+}
+
+// Cache with tags for selective invalidation
+"use cache"
+async function getProductsByCategory(category: string) {
+  const products = await db.products.findMany({
+    where: { category },
+    include: { reviews: true }
+  });
+  
+  return products;
+}
+```
+
+## ⚡ Server Actions with "use server"
+
+Server Actions provide a seamless way to handle server-side logic directly from your React components, eliminating the need for separate API routes in many cases.
+
+### Form Handling Made Simple
+
+```jsx
+import { revalidatePath } from 'next/cache';
+
+"use server"
+async function createTodo(formData: FormData) {
+  const title = formData.get('title') as string;
+  const description = formData.get('description') as string;
+  
+  await db.todos.create({
+    data: { title, description }
+  });
+  
+  revalidatePath('/todos');
+}
+
+export default function TodoForm() {
+  return (
+    <form action={createTodo}>
+      <input name="title" placeholder="Todo title" />
+      <textarea name="description" placeholder="Description" />
+      <button type="submit">Create Todo</button>
+    </form>
+  );
+}
+```
+
+### Complex Server Logic
+
+```jsx
+"use server"
+async function processPayment(
+  amount: number,
+  paymentMethodId: string,
+  metadata: Record<string, string>
+) {
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount * 100, // Convert to cents
+      currency: 'usd',
+      payment_method: paymentMethodId,
+      confirm: true,
+      metadata,
+    });
+    
+    if (paymentIntent.status === 'succeeded') {
+      await db.orders.create({
+        data: {
+          amount,
+          paymentIntentId: paymentIntent.id,
+          status: 'paid',
+          metadata,
+        }
+      });
+      
+      return { success: true, orderId: paymentIntent.id };
+    }
+    
+    return { success: false, error: 'Payment failed' };
+  } catch (error) {
+    console.error('Payment error:', error);
+    return { success: false, error: 'Payment processing failed' };
+  }
+}
+```
+
+## 🎯 Best Practices and Performance Tips
+
+### 1. Smart Caching Strategy
+
+```jsx
+"use cache"
+async function getCachedUserPreferences(userId: string) {
+  // This will be cached per user
+  const preferences = await db.userPreferences.findUnique({
+    where: { userId }
+  });
+  
+  return preferences;
+}
+
+// Use with cache tags for better invalidation
+"use cache"
+async function getPostsWithCache(category?: string) {
+  const posts = await db.posts.findMany({
+    where: category ? { category } : {},
+    include: { author: true, comments: true }
+  });
+  
+  return posts;
+}
+```
+
+### 2. Error Handling in Server Actions
+
+```jsx
+"use server"
+async function updateUserProfile(userId: string, formData: FormData) {
+  try {
+    const name = formData.get('name') as string;
+    const email = formData.get('email') as string;
+    
+    // Validation
+    if (!name || !email) {
+      throw new Error('Name and email are required');
+    }
+    
+    const updatedUser = await db.users.update({
+      where: { id: userId },
+      data: { name, email }
+    });
+    
+    revalidatePath('/profile');
+    return { success: true, user: updatedUser };
+  } catch (error) {
+    console.error('Profile update error:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown error' 
+    };
+  }
+}
+```
+
+## 🔧 Real-World Implementation
+
+Here's how these features work together in a real application:
+
+```jsx
+// Cache expensive dashboard data
+"use cache"
+async function getDashboardData(userId: string) {
+  const [user, stats, recentActivity] = await Promise.all([
+    db.users.findUnique({ where: { id: userId } }),
+    db.analytics.findMany({ where: { userId } }),
+    db.activities.findMany({ 
+      where: { userId }, 
+      orderBy: { createdAt: 'desc' },
+      take: 10 
+    })
+  ]);
+  
+  return { user, stats, recentActivity };
+}
+
+// Server action for updating settings
+"use server"
+async function updateDashboardSettings(userId: string, settings: any) {
+  await db.users.update({
+    where: { id: userId },
+    data: { settings }
+  });
+  
+  revalidatePath('/dashboard');
+}
+
+export default async function Dashboard({ userId }: { userId: string }) {
+  const { user, stats, recentActivity } = await getDashboardData(userId);
+  
+  return (
+    <div className="dashboard">
+      <h1>Welcome, {user.name}!</h1>
+      <StatsGrid stats={stats} />
+      <RecentActivity activities={recentActivity} />
+      <SettingsForm action={updateDashboardSettings.bind(null, userId)} />
+    </div>
+  );
+}
+```
+
+## 🚀 Performance Benefits
+
+The combination of `"use cache"` and `"use server"` provides:
+
+- **Reduced Bundle Size**: Server logic stays on the server
+- **Better SEO**: Server-side rendering with cached data
+- **Improved UX**: Faster page loads and interactions
+- **Simplified Architecture**: Less API boilerplate
+- **Type Safety**: End-to-end TypeScript support
+
+## 🎉 Conclusion
+
+Next.js continues to push the boundaries of what's possible in web development. The `"use cache"` and `"use server"` directives represent a significant leap forward in how we think about performance and developer experience.
+
+By leveraging these features, you can build applications that are not only faster and more efficient but also easier to maintain and scale. The future of web development is here, and it's more exciting than ever!
+
+*What are your thoughts on these new Next.js features? Have you started implementing them in your projects? Share your experiences in the comments!* 

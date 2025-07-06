@@ -3,9 +3,9 @@ import { HomeIcon, NotebookIcon } from "lucide-react";
 
 export const DATA = {
   name: "Lorrys Code",
-  initials: "DV",
+  initials: "LC",
   url: "https://dillion.io",
-  location: "San Francisco, CA",
+  location: "Luanda, Angola",
   locationLink: "https://www.google.com/maps/place/sanfrancisco",
   description:
     "Software Engineer, passionate about logic, building flawless interfaces, and creating innovative solutions. I turn ideas into reality.",
@@ -82,7 +82,37 @@ export const DATA = {
       start: "June 2024",
       end: "At the moment ",
       description:
-        "Specialist in performance optimization and user experience. I have solved complex problems in web applications, improving speed by up to 90% and user satisfaction by up to 80%. I implement advanced strategies such as Optimistic UI, caching, and observers to create smooth, accessible, and high-performance interfaces.",
+        `
+     <p>
+  I work as a frontend lead at Horizon Dev LLC, responsible for coordinating the technical team and delivering scalable, accessible, and high-performance solutions to international clients.
+  I specialize in performance optimization and user experience, solving complex bottlenecks in web applications—with results such as up to <strong>90% speed improvement</strong> and an <strong>80% increase in user satisfaction</strong>.
+</p>
+
+<p>
+  I employ modern strategies like optimistic UI, smart caching, Intersection Observers, selective preloading, and clean componentization to build fluid, responsive, and highly maintainable interfaces.
+  I use metrics such as Web Vitals, render profiling, and automated testing to ensure quality and performance in every delivery.
+</p>
+
+<p><strong>Projects I’ve led at Horizon:</strong></p>
+<ul>
+  <li>
+    <strong>VREF (Valuation & Real Estate Forecasting):</strong> A platform for property valuation and market forecasting, with interactive maps and real-time data.
+    I used Web Workers and Intersection Observer for asynchronous rendering of geospatial data. Components optimized with React, TailwindCSS, and GraphQL (Apollo Cache).
+  </li>
+  <li>
+    <strong>Manage DNS:</strong> A modern dashboard for domain and DNS record management. Built with Vue 3 (Composition API), focusing on fast inline editing, local caching with IndexedDB, and real-time updates via WebSockets.
+  </li>
+  <li>
+    <strong>Plataform:</strong> An internal administrative system for project and team management. I developed the proprietary Design System with Design Tokens and full responsiveness.
+    Dashboards feature dynamic charts (Recharts), animations (Framer Motion), and RBAC (role-based access control) directly in the frontend.
+  </li>
+  <li>
+    <strong>Venetor:</strong> A private network and digital security app with a mobile-first focus, using React Native Web.
+    Offline-ready interface with Service Workers and IndexedDB. Highlighted features include the alerts and logs system with dynamic filters and performant infinite scroll.
+  </li>
+</ul>
+
+        `,
     },
     {
       company: "Solutec AO",
@@ -94,7 +124,7 @@ export const DATA = {
       start: "April 2023",
       end: "Mai 2024",
       description:
-        "I was responsible for developing an application that translates gestures into Angola’s national languages, provides text translations, and offers a language learning section for local dialects. I also implemented a real-time translation chat to facilitate communication between users speaking different languages. The application was recognized as one of the top 50 startups in the world at an exhibition in Dubai, organized by Expand North Star during GITEX Global 2024, achieving an acceptance rate of up to 75% among participants.",
+        "I was responsible for developing an application that translates gestures into Angola's national languages, provides text translations, and offers a language learning section for local dialects. I also implemented a real-time translation chat to facilitate communication between users speaking different languages. The application was recognized as one of the top 50 startups in the world at an exhibition in Dubai, organized by Expand North Star during GITEX Global 2024, achieving an acceptance rate of up to 75% among participants.",
     },
     {
       company: "CAF, NTC ",

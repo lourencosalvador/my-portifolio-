@@ -1,57 +1,93 @@
 import BlurFade from "@/components/magicui/blur-fade";
 import { getBlogPosts } from "@/data/blog";
+import { formatDate } from "@/lib/utils";
 import Link from "next/link";
-import Image from "next/image";
-import Gloss from '@/../public/glass.svg'
-import ImageCode from '@/../public/code.png'
+import { Badge } from "@/components/ui/badge";
+import { Calendar, Clock, User } from "lucide-react";
 
 export const metadata = {
   title: "Blog",
-  description: "My thoughts on software development, life, and more.",
+  description: "Thoughts on software development, React, Next.js, and building amazing digital experiences.",
 };
 
 const BLUR_FADE_DELAY = 0.04;
 
+// Default blog image for posts without custom images
+const DEFAULT_BLOG_IMAGES = [
+  "/blog/nextjs-performance.jpg",
+  "/blog/ui-cloning.jpg", 
+  "/blog/react-native-prebuild.jpg"
+];
+
 export default async function BlogPage() {
   const posts = await getBlogPosts();
-
+  
   return (
-    <section>
-      <Image 
-        src={Gloss} 
-        alt="pattern background" 
-        className="absolute inset-0 w-full h-full object-cover -z-30"
-      />
-      <BlurFade delay={BLUR_FADE_DELAY}>
-        <h1 className="font-medium text-2xl mb-8 tracking-tighter">Blog</h1>
-      </BlurFade>
-
-      <div className="max-h-[45rem] overflow-auto scrollbar-none">
-        {posts
-          .flatMap((post) => Array(4).fill(post)) 
-          .sort((a, b) => 
-            new Date(b.metadata.publishedAt).getTime() - new Date(a.metadata.publishedAt).getTime()
-          )
-          .map((post, id) => (
-            <BlurFade delay={BLUR_FADE_DELAY * 2 + id * 0.05} key={`${post.slug}-${id}`}>
-              <Link
-                className="flex flex-col space-y-1 mb-4"
-                href={`/blog/${post.slug}`}
+    <div className="max-w-2xl mx-auto w-full">
+      <section>
+        <BlurFade delay={BLUR_FADE_DELAY}>
+          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+            <div className="space-y-2">
+            
+              <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl text-shadow-glow">
+                Latest Posts
+              </h1>
+              <div className="w-16 h-1 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full mx-auto"></div>
+            </div>
+          </div>
+        </BlurFade>
+        
+        <BlurFade delay={BLUR_FADE_DELAY * 2}>
+          <div className="space-y-6">
+            {posts.map((post, id) => (
+              <BlurFade
+                key={post.slug}
+                delay={BLUR_FADE_DELAY * 3 + id * 0.05}
               >
-                <div className="w-full flex flex-col">
-                  <p className="tracking-tight">{post.metadata.title}</p>
-                  <p className="h-6 text-xs text-muted-foreground">
-                    {post.metadata.publishedAt}
-                  </p>
-                </div>
-                <div className="w-full h-[18rem] rounded-lg bg-blue-800 overflow-hidden">
-                  <Image src={ImageCode} alt="code" className="object-cover w-full h-full"/>
-                </div>
-              </Link>
-            </BlurFade>
-          ))}
-      </div>
-    </section>
+                <Link href={`/blog/${post.slug}`}>
+                  <div className="glass-effect backdrop-blur-sm border border-white/20 hover:border-purple-500/50 transition-all duration-300 p-6 rounded-xl blog-card relative group">
+                    <div className="flex flex-col md:flex-row gap-6">
+                      {/* Content */}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">
+                            {post.metadata.category} {post.metadata.emoji}
+                          </Badge>
+                          <span className="text-sm text-muted-foreground">•</span>
+                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                            <Calendar className="size-3" />
+                            {formatDate(post.metadata.publishedAt)}
+                          </div>
+                        </div>
+                        
+                        <h2 className="text-xl font-bold mb-3 group-hover:text-purple-400 transition-colors">
+                          {post.metadata.title}
+                        </h2>
+                        
+                        <p className="text-muted-foreground mb-4 line-clamp-2">
+                          {post.metadata.summary}
+                        </p>
+                        
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <Clock className="size-3" />
+                            {post.metadata.readingTime} min read
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <User className="size-3" />
+                            {post.metadata.author}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </BlurFade>
+            ))}
+          </div>
+        </BlurFade>
+      </section>
+    </div>
   );
 }
 
